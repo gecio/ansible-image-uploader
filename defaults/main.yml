@@ -1,0 +1,8 @@
+images_enabled: 
+  - ubuntu/xenial_xerus
+  - ubuntu/jammy_jellyfish
+  - ubuntu/bionic_beaver
+  - ubuntu/focal_fossa
+  - debian/bullseye
+  - debian/buster
+  - flatcar/production

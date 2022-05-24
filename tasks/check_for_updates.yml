@@ -1,0 +1,53 @@
+- name: "Loading settings for {{ image_name }}"
+  ansible.builtin.include_vars:
+    name: image
+    file: "images/{{ image_name }}.yml"
+
+
+- name: "Fetch checksum for {{ image.distribution }} - {{ image.release }}"
+  ansible.builtin.uri:
+    url: "{{ image.checksum }}"
+    return_content: true
+  register: source_checksum
+
+- name: Parse checksum
+  ansible.utils.cli_parse:
+    text: "{{ source_checksum['content'] }}"
+    parser:
+      name: ansible.netcommon.native
+      template_path: "{{ role_path }}/templates/source_checksum.yml"
+  register: parsed_checksum
+
+
+- name: Check if version already exists in glance
+  openstack.cloud.image_info:
+    properties:
+      uploaded_by: Image Uploader 
+      source_hash: "{{ parsed_checksum.parsed[image.url | basename] }}"
+  register: result
+  changed_when: result.openstack_image | count == 0
+
+
+- name: Current version not in glance -> Proceeding
+  ansible.builtin.include_tasks: # noqa no-handler
+    file: download_image.yml
+  when: result is changed
+  vars:
+    distribution: "{{ image.distribution }}"
+    release: "{{ image.release }}"
+    url: "{{ image.url }}"
+    checksum: "{{ parsed_checksum.parsed[image.url | basename] }}"
+    algorithm: "{{ image.algorithm }}"
+    version: "{{ image.version | default(omit) }}" 
+    ssh_user: "{{ image.ssh_user | default(image.distribution) }}"
+    testing_enabled: "{{ image.testing_enabled | default(True) }}"
+    display_name: >-
+      {{
+        image.display_name | default( 
+        [
+          image.distribution | capitalize, 
+          image.version | default(Undefined), 
+          image.release | title 
+        ] | select("defined") | join(' ') )
+      }}
+    source_filename: "{{ image.url | basename }}"

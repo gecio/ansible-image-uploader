@@ -1,0 +1,18 @@
+- name: Included images
+  debug:
+    var: images_enabled
+
+- name: Prepare local environment
+  ansible.builtin.include_tasks:
+    file: prepare.yml
+
+- name: Processing images
+  ansible.builtin.include_tasks:
+    file: check_for_updates.yml
+  with_items: "{{ images_enabled }}"
+  loop_control:
+    loop_var: image_name
+
+- name: Cleanup old images
+  ansible.builtin.include_tasks:
+    file: cleanup.yml

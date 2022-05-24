@@ -1,0 +1,39 @@
+# Lookup images
+- name: Retrieve images uploaded by us
+  openstack.cloud.image_info:
+    properties:
+      visibility: community
+      uploaded_by: Image Uploader  
+  register: registered_images
+  no_log: true
+
+# Get instances used with these images
+- name: Get instances using our images
+  command: "openstack server list --all-projects --image {{ item.id }} --limit 1"
+  loop: "{{ registered_images.openstack_image }}"
+  loop_control:
+    label: "{{ item.name }}"
+  register: servers
+  changed_when: servers.stdout_lines | count == 0 # No Instances found -> changed
+  no_log: true
+
+
+- name: Set image to unprotected
+  openstack.cloud.image:
+    id: "{{ item.item.id }}"    
+    name: "{{ item.item.name}}"
+    protected: False
+  loop: "{{ servers.results }}" 
+  loop_control:
+    label: "{{ item.item.name }}"  
+  when: item.changed
+
+- name: Remove unused images
+  openstack.cloud.image:
+    id: "{{ item.item.id }}"
+    name: "{{ item.item.name }}"
+    state: absent 
+  loop: "{{ servers.results }}" 
+  loop_control:
+    label: "{{ item.item.name }}"
+  when: item.changed

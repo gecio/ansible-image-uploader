@@ -1,0 +1,38 @@
+# Cleanup artifacts from previous runs
+- name: Remove previous testing image
+  openstack.cloud.image:
+    name: "{{ display_name }} - Testing"
+    state: absent
+
+
+# Upload new image to glance
+- name: Upload Image as testing
+  openstack.cloud.image:
+    name: "{{ display_name }} - Testing"
+    container_format: bare
+    disk_format: qcow2
+    state: present
+    filename: "{{ tmp_folder }}/{{ filename }}"
+    properties:
+      description: "{{ ansible_date_time.date }}"
+      uploaded_by: Image Uploader
+      hw_disk_bus: scsi
+      hw_qemu_guest_agent: true
+      hw_scsi_model: virtio-scsi
+      os_require_quiesce: true
+      source_hash: "{{ checksum }}"
+  register: uploaded_image
+
+- name: Run tests on new image
+  ansible.builtin.include_tasks: # noqa no-handler
+    file: testing.yml
+  vars:
+    image: "{{ uploaded_image }}"
+  when: uploaded_image.changed  
+
+- name: "Rotate images for {{ display_name }}"
+  ansible.builtin.include_tasks: # noqa no-handler
+    file: rotate_image.yml
+  vars:
+    image: "{{ uploaded_image.image }}"
+  when: uploaded_image.changed  
