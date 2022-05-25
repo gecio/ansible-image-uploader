@@ -7,15 +7,14 @@
     timeout: 30
   register: download
 
-
 # handle different formats
 - name: Check file format
   ansible.builtin.stat:
     path: "{{ tmp_folder }}/{{ source_filename }}"
-    get_mime: yes
+    get_mime: true
   register: file_information
 
-- name: File is a qcow2 image 
+- name: File is a qcow2 image
   block:
     - name: Proceed to upload
       ansible.builtin.include_tasks:
@@ -24,7 +23,7 @@
         filename: "{{ source_filename }}"
   when: '"QEMU QCOW2 Image" in file_information.mimetype'
 
-- name: File is bzip2 compressed 
+- name: File is bzip2 compressed
   block:
     - name: Decompress image
       ansible.builtin.shell: "bzip2 -d -k -c {{ source_filename }} > {{ source_filename }}.qcow2"

@@ -6,9 +6,9 @@
 
 - name: Set previous latest image to community and change its name
   openstack.cloud.image: # noqa no-handler
-    id: "{{ latest_image_in_glance.openstack_image.id }}"    
+    id: "{{ latest_image_in_glance.openstack_image.id }}"
     name: "{{ display_name }} - Latest"
-    properties: 
+    properties:
       visibility: community
       name: "{{ display_name }} - {{ latest_image_in_glance.openstack_image.description }}"
     protected: true
@@ -16,7 +16,7 @@
 
 - name: Set new image to public and protected
   openstack.cloud.image: # noqa no-handler
-    id: "{{ image.id }}"    
+    id: "{{ image.id }}"
     name: "{{ image.name }}"
     properties:
       visibility: public
@@ -25,10 +25,10 @@
   when: uploaded_image.changed
 
 - name: Add new image to report
-  set_fact: # noqa no-handler
-    images_uploaded: "{{ images_uploaded + [{ 'title': report_item.title, 'value': report_item.value }] }}"
+  ansible.builtin.set_fact: # noqa no-handler jinja
+    images_uploaded: "{{ images_uploaded + [{'title': report_item.title, 'value': report_item.value}] }}"
   loop_control:
     loop_var: report_item
   with_items:
-    - { 'title': "{{ display_name }} - Latest" , 'value': "{{ image.id }}" }
+    - { "title": "{{ display_name }} - Latest", "value": "{{ image.id }}" }
   when: uploaded_image.changed

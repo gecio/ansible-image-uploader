@@ -1,5 +1,20 @@
+# Ensure openstacksdk 0.100.0 is not in use, it's silently broken
+- name: Get pip packages
+  community.general.pip_package_info:
+  register: pip_packages
+
+- name: Check version constraints
+  ansible.builtin.assert:
+    that:
+      - pip_packages.packages.pip.openstacksdk[0].version is version('0.99.0', '<')
+      - lookup('community.general.collection_version', 'openstack.cloud') is version('2.0.0', '<')
+    fail_msg: |
+      Ensure
+        - your openstacksdk is below 0.99.0
+        - your openstack.cloud-collection is below 2.0.0
+
 - name: Included images
-  debug:
+  ansible.builtin.debug:
     var: images_enabled
 
 - name: Prepare local environment
@@ -16,3 +31,4 @@
 - name: Cleanup old images
   ansible.builtin.include_tasks:
     file: cleanup.yml
+  when: images_cleanup

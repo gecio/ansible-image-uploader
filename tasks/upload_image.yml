@@ -4,7 +4,6 @@
     name: "{{ display_name }} - Testing"
     state: absent
 
-
 # Upload new image to glance
 - name: Upload Image as testing
   openstack.cloud.image:
@@ -28,11 +27,13 @@
     file: testing.yml
   vars:
     image: "{{ uploaded_image }}"
-  when: uploaded_image.changed  
+  when:
+    - uploaded_image.changed
+    - images_testing
 
 - name: "Rotate images for {{ display_name }}"
   ansible.builtin.include_tasks: # noqa no-handler
     file: rotate_image.yml
   vars:
     image: "{{ uploaded_image.image }}"
-  when: uploaded_image.changed  
+  when: uploaded_image.changed

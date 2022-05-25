@@ -14,7 +14,6 @@
     name: image-test-instance
     state: absent
 
-
 ### Setup ssh key pair
 - name: Create SSH keypair
   ansible.builtin.user:
@@ -28,7 +27,6 @@
     state: present
     name: image_test
     public_key: "{{ generated_ssh_key.ssh_public_key }}"
-  
 
 ### Create Network, Subnet and Router, required for instances
 - name: Create Network
@@ -72,21 +70,20 @@
     protocol: icmp
     remote_ip_prefix: 0.0.0.0/0
 
-
 ### Create Instance
 - name: Create an instance
   openstack.cloud.server:
     name: image-test-instance
-    auto_ip: yes
-    availability_zone: es1
-    boot_from_volume: no
-    delete_fip: yes
-    flavor: m1.small
+    auto_ip: "{{ images_testing_auto_ip }}"
+    availability_zone: "{{ images_testing_availability_zone }}"
+    boot_from_volume: "{{ images_testing_boot_from_volume }}"
+    delete_fip: "{{ images_testing_delete_fip }}"
+    flavor: "{{ images_testing_flavor }}"
     image: "{{ image.id }}"
     key_name: image_test
     network: image-test-network
-    reuse_ips: yes
-    security_groups: 
+    reuse_ips: true
+    security_groups:
       - default
       - image-test-securitygroup
     timeout: 600
@@ -96,7 +93,7 @@
 
 ### Ensure we have a running instance with SSH
 - name: Wait for SSH Port to open
-  wait_for:
+  ansible.builtin.wait_for:
     port: 22
     host: "{{ server.openstack.public_v4 }}"
     search_regex: SSH
@@ -104,11 +101,11 @@
 
 ### Add the server to our inventory
 - name: Add the server to our inventory
-  add_host:
-    name: '{{ server.openstack.public_v4 }}'
+  ansible.builtin.add_host:
+    name: "{{ server.openstack.public_v4 }}"
     ansible_user: "{{ ssh_user }}"
     ansible_ssh_private_key_file: "{{ tmp_folder }}/ssh.key"
-    host_key_checking: False
+    host_key_checking: false
     ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
 ### Test the new instance
@@ -121,13 +118,13 @@
     # Try a manual ssh connection
     - name: Test connecting manually (for instances without python)
       ansible.builtin.command: >-
-        ssh 
-          {{ server.openstack.public_v4 }} 
-          -l {{ ssh_user }} 
-          -i {{ tmp_folder }}/ssh.key 
-          -o StrictHostKeyChecking=no 
+        ssh
+          {{ server.openstack.public_v4 }}
+          -l {{ ssh_user }}
+          -i {{ tmp_folder }}/ssh.key
+          -o StrictHostKeyChecking=no
           -o UserKnownHostsFile=/dev/null
-          -T 
+          -T
           exit
       retries: 10
       register: result
@@ -149,7 +146,6 @@
         var: echo_output
   when: testing_enabled
   delegate_to: "{{ server.openstack.public_v4 }}"
-
 
 ###################################################################################
 ###  Once tested, the instance and associated resources should then be removed ###
@@ -191,6 +187,6 @@
     name: image_test
 
 - name: Delete SSH key file
-  file:
+  ansible.builtin.file:
     dest: "{{ tmp_folder }}/ssh.key"
     state: absent
