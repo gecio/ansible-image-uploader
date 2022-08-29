@@ -3,7 +3,7 @@ galaxy_info:
   role_name: image_uploader
   author: Flo (max06) Müller
   description: Keeps cloud images up to date in OpenStack
-  company: German Edge Cloud GmbH
+  company: German Edge Cloud GmbH & Co. KG
 
   license: GPLv3
 
