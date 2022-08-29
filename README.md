@@ -37,7 +37,8 @@ SUCH DAMAGES.
 
 ## Requirements
 
-  * [Openstack SDK](https://docs.openstack.org/openstacksdk/latest/user/install.html) below version 0.99
+  * [Openstack SDK](https://docs.openstack.org/openstacksdk/latest/install/index.html) below version 0.99
+    * `pip install openstacksdk==0.61.0`
   * Configured Openstack credentials (preferrably by using a `clouds.yaml` file and the corresponding `OS_CLOUD` environment variable).
   * Admin privileges to allow setting image visibility.
 
