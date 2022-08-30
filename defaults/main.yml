@@ -1,0 +1,18 @@
+images_enabled:
+  - ubuntu/xenial_xerus
+  - ubuntu/jammy_jellyfish
+  - ubuntu/bionic_beaver
+  - ubuntu/focal_fossa
+  - debian/bullseye
+  - debian/buster
+  - flatcar/production
+
+images_cleanup: false
+
+images_testing: true
+
+images_testing_auto_ip: true
+images_testing_availability_zone: es1
+images_testing_boot_from_volume: false
+images_testing_delete_fip: true
+images_testing_flavor: m1.small

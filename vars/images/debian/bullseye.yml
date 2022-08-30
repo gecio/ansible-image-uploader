@@ -1,0 +1,6 @@
+distribution: debian
+release: bullseye
+url: http://cloud.debian.org/images/cloud/bullseye/latest/debian-11-genericcloud-amd64.qcow2
+checksum: http://cloud.debian.org/images/cloud/bullseye/latest/SHA512SUMS
+version: 11
+algorithm: SHA512

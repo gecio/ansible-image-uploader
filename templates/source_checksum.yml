@@ -1,0 +1,10 @@
+---
+- example: SHA256 (CentOS-8-GenericCloud-8.1.1911-20200113.3.x86_64.qcow2) = e2cf1081645b1089f574918fb808b32d247169ec4ec1a13bca9e14a74df6530e
+  getval: 'SHA256 \((?P<name>\S+)\)\s\=\s(?P<checksum>\S+)'
+  result:
+    "{{ name }}": "{{ checksum }}"
+
+- example: 71a4f4c8f85ed33aa99c8f99a5b52dbcb88a403ebb0b16485c1aea698d091903 *ubuntu-20.04-server-cloudimg-amd64-disk-kvm.img
+  getval: '(?P<checksum>\S+)\s+\**(?P<name>\S+)'
+  result:
+    "{{ name }}": "{{ checksum }}"
