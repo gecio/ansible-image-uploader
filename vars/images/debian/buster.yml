@@ -1,0 +1,6 @@
+distribution: debian
+release: buster
+url: http://cloud.debian.org/images/cloud/buster/latest/debian-10-genericcloud-amd64.qcow2
+checksum: http://cloud.debian.org/images/cloud/buster/latest/SHA512SUMS
+version: 10
+algorithm: SHA512

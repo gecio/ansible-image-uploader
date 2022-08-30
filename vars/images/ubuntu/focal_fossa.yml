@@ -1,0 +1,6 @@
+distribution: ubuntu
+release: "focal fossa"
+url: https://cloud-images.ubuntu.com/releases/focal/release/ubuntu-20.04-server-cloudimg-amd64.img
+checksum: https://cloud-images.ubuntu.com/releases/focal/release/SHA256SUMS
+version: 20.04
+algorithm: SHA256
