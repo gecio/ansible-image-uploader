@@ -21,7 +21,7 @@
         file: upload_image.yml
       vars:
         filename: "{{ source_filename }}"
-  when: '"QEMU QCOW2 Image" in file_information.mimetype'
+  when: '"QEMU QCOW2 Image" in file_information.stat.mimetype'
 
 - name: File is bzip2 compressed
   block:
@@ -35,4 +35,4 @@
         file: upload_image.yml
       vars:
         filename: "{{ source_filename }}.qcow2"
-  when: '"bzip2 compressed data" in file_information.mimetype'
+  when: '"bzip2 compressed data" in file_information.stat.mimetype'
