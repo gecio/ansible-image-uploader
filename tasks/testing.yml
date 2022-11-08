@@ -77,6 +77,7 @@
     auto_ip: "{{ images_testing_auto_ip }}"
     availability_zone: "{{ images_testing_availability_zone }}"
     boot_from_volume: "{{ images_testing_boot_from_volume }}"
+    config_drive: "{{ image.config_drive }}"
     delete_fip: "{{ images_testing_delete_fip }}"
     flavor: "{{ images_testing_flavor }}"
     image: "{{ image.id }}"
@@ -110,6 +111,7 @@
 
 ### Test the new instance
 - name: Run tests
+  when: not testing_enabled
   block:
     - name: Wait period
       ansible.builtin.command: sleep 20
@@ -130,10 +132,11 @@
       register: result
       until: result.rc == 0
       changed_when: never
-  when: not testing_enabled
 
 ### Test the new instance
 - name: Run tests
+  when: testing_enabled
+  delegate_to: "{{ server.openstack.public_v4 }}"
   block:
     - name: Test Echo on New Server
       ansible.builtin.command: "date"
@@ -144,8 +147,6 @@
     - name: Print Echo
       ansible.builtin.debug:
         var: echo_output
-  when: testing_enabled
-  delegate_to: "{{ server.openstack.public_v4 }}"
 
 ###################################################################################
 ###  Once tested, the instance and associated resources should then be removed ###

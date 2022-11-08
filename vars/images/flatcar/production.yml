@@ -1,8 +1,8 @@
 distribution: flatcar
 release: production
 url: https://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_production_openstack_image.img.bz2
-checksum: https://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_production_openstack.DIGESTS
+checksum: https://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_production_openstack_image.img.bz2.DIGESTS
 algorithm: SHA512
 ssh_user: core
-testing_enabled: False
+testing_enabled: false
 display_name: Flatcar_Production

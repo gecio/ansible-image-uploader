@@ -4,7 +4,7 @@
     file: "images/{{ image_name }}.yml"
 
 
-- name: "Fetch checksum for {{ image.distribution }} - {{ image.release }}"
+- name: Fetch checksum
   ansible.builtin.uri:
     url: "{{ image.checksum }}"
     return_content: true
@@ -39,7 +39,8 @@
     algorithm: "{{ image.algorithm }}"
     version: "{{ image.version | default(omit) }}"
     ssh_user: "{{ image.ssh_user | default(image.distribution) }}"
-    testing_enabled: "{{ image.testing_enabled | default(True) }}"
+    testing_enabled: "{{ image.testing_enabled | default(true) }}"
+    config_drive: "{{ image.config_drive | default(false) }}"
     display_name: >-
       {{
         image.display_name | default(

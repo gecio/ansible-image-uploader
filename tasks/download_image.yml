@@ -15,15 +15,16 @@
   register: file_information
 
 - name: File is a qcow2 image
+  when: '"QEMU QCOW2 Image" in file_information.mimetype'
   block:
     - name: Proceed to upload
       ansible.builtin.include_tasks:
         file: upload_image.yml
       vars:
         filename: "{{ source_filename }}"
-  when: '"QEMU QCOW2 Image" in file_information.mimetype'
 
 - name: File is bzip2 compressed
+  when: '"bzip2 compressed data" in file_information.mimetype'
   block:
     - name: Decompress image
       ansible.builtin.shell: "bzip2 -d -k -c {{ source_filename }} > {{ source_filename }}.qcow2"
@@ -35,4 +36,3 @@
         file: upload_image.yml
       vars:
         filename: "{{ source_filename }}.qcow2"
-  when: '"bzip2 compressed data" in file_information.mimetype'
