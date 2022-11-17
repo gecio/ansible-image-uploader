@@ -10,7 +10,7 @@
 # Get instances used with these images
 - name: Get instances using our images
   ansible.builtin.command: "openstack server list --all-projects --image {{ item.id }} --limit 1"
-  loop: "{{ registered_images.openstack_image }}"
+  loop: "{{ registered_images.openstack_images }}"
   loop_control:
     label: "{{ item.name }}"
   register: servers

@@ -2,15 +2,15 @@
   openstack.cloud.image_info:
     image: "{{ display_name }} - Latest"
   register: latest_image_in_glance
-  changed_when: latest_image_in_glance.openstack_image
+  changed_when: latest_image_in_glance.image
 
 - name: Set previous latest image to community and change its name
   openstack.cloud.image: # noqa no-handler
-    id: "{{ latest_image_in_glance.openstack_image.id }}"
+    id: "{{ latest_image_in_glance.image.id }}"
     name: "{{ display_name }} - Latest"
     properties:
       visibility: community
-      name: "{{ display_name }} - {{ latest_image_in_glance.openstack_image.description }}"
+      name: "{{ display_name }} - {{ latest_image_in_glance.image.description }}"
     protected: true
   when: latest_image_in_glance.changed
 
