@@ -25,7 +25,7 @@
       uploaded_by: Image Uploader
       source_hash: "{{ parsed_checksum.parsed[image.url | basename] }}"
   register: result
-  changed_when: result.openstack_image | count == 0
+  changed_when: result.openstack_images | count == 0
 
 - name: Current version not in glance -> Proceeding
   ansible.builtin.include_tasks: # noqa no-handler
