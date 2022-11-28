@@ -8,10 +8,11 @@
     that:
       - pip_packages.packages.pip.openstacksdk[0].version is version('0.99.0', '<')
       - lookup('community.general.collection_version', 'openstack.cloud') is version('2.0.0', '<')
+      - lookup('community.general.collection_version', 'openstack.cloud') is version('1.9.0', '>=')
     fail_msg: |
       Ensure
         - your openstacksdk is below 0.99.0
-        - your openstack.cloud-collection is below 2.0.0
+        - your openstack.cloud-collection is at least 1.9.0 and not newer or equal 2.0
 
 - name: Included images
   ansible.builtin.debug:
