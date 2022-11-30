@@ -1,7 +1,14 @@
 - name: "Loading settings for {{ image_name }}"
   ansible.builtin.include_vars:
     name: image
-    file: "images/{{ image_name }}.yml"
+    file: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - 'images/{{ image_name }}.yml'
+      paths:
+        - 'vars'
+        - '../vars'
 
 
 - name: Fetch checksum
