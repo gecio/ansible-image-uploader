@@ -9,10 +9,9 @@
 
 # handle different formats
 - name: Check file format
-  ansible.builtin.stat:
-    path: "{{ tmp_folder }}/{{ source_filename }}"
-    get_mime: true
+  ansible.builtin.command: file {{ tmp_folder }}/{{ source_filename }}
   register: file_information
+  changed_when: false
 
 - name: File is a qcow2 image
   when: '"QEMU QCOW2 Image" in file_information.mimetype'
