@@ -1,6 +1,6 @@
 - name: "Loading settings for {{ image_name }}"
   ansible.builtin.include_vars:
-    name: image
+    name: image_data
     file: "{{ lookup('ansible.builtin.first_found', params) }}"
   vars:
     params:
@@ -13,7 +13,7 @@
 
 - name: Fetch checksum
   ansible.builtin.uri:
-    url: "{{ image.checksum }}"
+    url: "{{ image_data.checksum }}"
     return_content: true
   register: source_checksum
 
@@ -30,7 +30,7 @@
   openstack.cloud.image_info:
     properties:
       uploaded_by: Image Uploader
-      source_hash: "{{ parsed_checksum.parsed[image.url | basename] }}"
+      source_hash: "{{ parsed_checksum.parsed[image_data.url | basename] }}"
   register: result
   changed_when: result.openstack_images | count == 0
 
@@ -39,22 +39,22 @@
     file: download_image.yml
   when: result is changed
   vars:
-    distribution: "{{ image.distribution }}"
-    release: "{{ image.release }}"
-    url: "{{ image.url }}"
-    checksum: "{{ parsed_checksum.parsed[image.url | basename] }}"
-    algorithm: "{{ image.algorithm }}"
-    version: "{{ image.version | default(omit) }}"
-    ssh_user: "{{ image.ssh_user | default(image.distribution) }}"
-    testing_enabled: "{{ image.testing_enabled | default(true) }}"
-    config_drive: "{{ image.config_drive | default(false) }}"
+    distribution: "{{ image_data.distribution }}"
+    release: "{{ image_data.release }}"
+    url: "{{ image_data.url }}"
+    checksum: "{{ parsed_checksum.parsed[image_data.url | basename] }}"
+    algorithm: "{{ image_data.algorithm }}"
+    version: "{{ image_data.version | default(omit) }}"
+    ssh_user: "{{ image_data.ssh_user | default(image_data.distribution) }}"
+    testing_enabled: "{{ image_data.testing_enabled | default(true) }}"
+    config_drive: "{{ image_data.config_drive | default(false) }}"
     display_name: >-
       {{
-        image.display_name | default(
+        image_data.display_name | default(
         [
-          image.distribution | capitalize,
-          image.version | default(Undefined),
-          image.release | title
+          image_data.distribution | capitalize,
+          image_data.version | default(Undefined),
+          image_data.release | title
         ] | select("defined") | join(' ') )
       }}
-    source_filename: "{{ image.url | basename }}"
+    source_filename: "{{ image_data.url | basename }}"
