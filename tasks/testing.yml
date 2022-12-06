@@ -77,7 +77,7 @@
     auto_ip: "{{ images_testing_auto_ip }}"
     availability_zone: "{{ images_testing_availability_zone }}"
     boot_from_volume: "{{ images_testing_boot_from_volume }}"
-    config_drive: "{{ image.config_drive }}"
+    config_drive: "{{ config_drive }}"
     delete_fip: "{{ images_testing_delete_fip }}"
     flavor: "{{ images_testing_flavor }}"
     image: "{{ image.id }}"
