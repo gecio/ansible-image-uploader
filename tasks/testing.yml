@@ -115,7 +115,7 @@
   block:
     - name: Wait period
       ansible.builtin.command: sleep 20
-      changed_when: never
+      changed_when: false
 
     # Try a manual ssh connection
     - name: Test connecting manually (for instances without python)
@@ -131,7 +131,7 @@
       retries: 10
       register: result
       until: result.rc == 0
-      changed_when: never
+      changed_when: false
 
 ### Test the new instance
 - name: Run tests
@@ -140,7 +140,7 @@
   block:
     - name: Test Echo on New Server
       ansible.builtin.command: "date"
-      changed_when: never
+      changed_when: false
       register: echo_output
 
     # Print the echo to command line
