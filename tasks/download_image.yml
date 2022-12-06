@@ -14,7 +14,7 @@
   changed_when: false
 
 - name: File is a qcow2 image
-  when: '"QEMU QCOW2 Image" in file_information.mimetype'
+  when: '"QEMU QCOW2 Image" in file_information.stdout'
   block:
     - name: Proceed to upload
       ansible.builtin.include_tasks:
@@ -23,7 +23,7 @@
         filename: "{{ source_filename }}"
 
 - name: File is bzip2 compressed
-  when: '"bzip2 compressed data" in file_information.mimetype'
+  when: '"bzip2 compressed data" in file_information.stdout'
   block:
     - name: Decompress image
       ansible.builtin.shell: "bzip2 -d -k -c {{ source_filename }} > {{ source_filename }}.qcow2"
