@@ -35,3 +35,17 @@
         file: upload_image.yml
       vars:
         filename: "{{ source_filename }}.qcow2"
+
+- name: File is XZ compressed
+  when: '"XZ compressed data" in file_information.stdout'
+  block:
+    - name: Decompress image
+      ansible.builtin.command: "unxz {{ source_filename }}"
+      args:
+        chdir: "{{ tmp_folder }}"
+        creates: "{{ tmp_folder }}/{{ source_filename | splitext | first }}"
+    - name: Proceed to upload
+      ansible.builtin.include_tasks:
+        file: upload_image.yml
+      vars:
+        filename: "{{ source_filename | splitext | first }}"
