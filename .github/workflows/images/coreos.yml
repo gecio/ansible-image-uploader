@@ -1,0 +1,64 @@
+# A github workflow monitoring a file on the internet, parsing it and creating a PR in this repo if the contents have changed
+# This workflow is triggered on a schedule
+# https://docs.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events-schedule
+name: CoreOS
+on:
+  schedule:
+    # every day at 3 pm
+    - cron: "0 15 * * *"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get release data
+        uses: actions/github-script@v6
+        id: fetch
+        with:
+          script: |
+            const release_data = await github.request('https://builds.coreos.fedoraproject.org/streams/stable.json');
+            const filtered_data = release_data['data']['architectures']['x86_64']['artifacts']['openstack'];
+
+            console.log(`::set-output name=version::${filtered_data['release']}`)
+            console.log(`::set-output name=url::${filtered_data['formats']['qcow2.xz']['disk']['location']}`);
+            console.log(`::set-output name=hash::${filtered_data['formats']['qcow2.xz']['disk']['sha256']}`);
+            console.log(filtered_data);
+
+      - name: Write image data
+        needs: fetch
+        id: write
+        run: |
+          mkdir -p vars/images/coreos
+          cat << EOF > vars/images/coreos/stable.yml
+          distribution: coreos
+          release: "stable"
+          display_name: CoreOS Stable
+          url: ${{ steps.fetch.outputs.url }}
+          checksum_raw: ${{ steps.fetch.outputs.hash }}
+          algorithm: SHA256
+          ssh_user: core
+          testing_enabled: false
+          EOF
+
+          cat vars/images/coreos/stable.yml
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v4
+        needs: write
+        with:
+          commit-message: "chore[images]: Update CoreOS Stable to ${{ steps.fetch.outputs.version }}"
+          title: "auto: Update CoreOS Stable"
+          body: |
+            Update CoreOS Stable to ${{ steps.fetch.outputs.version }}
+
+            This is an automated pull request.
+          branch: update/coreos-stable
+          delete-branch: true
+          labels: |
+            kind/update
+            area/images
+          team-reviewers: "optimist"
+          add-paths: |
+            vars/images/coreos/stable.yaml
+          token: ${{ secrets.GITHUB_TOKEN }}
