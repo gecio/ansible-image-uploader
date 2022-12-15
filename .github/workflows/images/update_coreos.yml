@@ -1,7 +1,7 @@
 # A github workflow monitoring a file on the internet, parsing it and creating a PR in this repo if the contents have changed
 # This workflow is triggered on a schedule
 # https://docs.github.com/en/actions/reference/events-that-trigger-workflows#scheduled-events-schedule
-name: CoreOS
+name: Update CoreOS
 on:
   schedule:
     # every day at 3 pm
@@ -58,5 +58,5 @@ jobs:
             area/images
           team-reviewers: "optimist"
           add-paths: |
-            vars/images/coreos/stable.yaml
+            vars/images/coreos/stable.yml
           token: ${{ secrets.GITHUB_TOKEN }}
