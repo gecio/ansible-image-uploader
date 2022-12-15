@@ -56,7 +56,6 @@ jobs:
           labels: |
             kind/update
             area/images
-          team-reviewers: "optimist"
           add-paths: |
             vars/images/coreos/stable.yml
           token: ${{ secrets.GITHUB_TOKEN }}
