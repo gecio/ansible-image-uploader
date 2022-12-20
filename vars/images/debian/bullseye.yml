@@ -4,3 +4,4 @@ url: http://cloud.debian.org/images/cloud/bullseye/latest/debian-11-genericcloud
 checksum: http://cloud.debian.org/images/cloud/bullseye/latest/SHA512SUMS
 version: 11
 algorithm: SHA512
+checksum_raw: null

@@ -4,3 +4,4 @@ url: https://cloud-images.ubuntu.com/releases/jammy/release/ubuntu-22.04-server-
 checksum: https://cloud-images.ubuntu.com/releases/jammy/release/SHA256SUMS
 version: 22.04
 algorithm: SHA256
+checksum_raw: null

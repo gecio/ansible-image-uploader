@@ -6,3 +6,4 @@ algorithm: SHA512
 ssh_user: core
 testing_enabled: false
 display_name: Flatcar_Production
+checksum_raw: null

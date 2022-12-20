@@ -4,3 +4,4 @@ url: http://cloud.debian.org/images/cloud/buster/latest/debian-10-genericcloud-a
 checksum: http://cloud.debian.org/images/cloud/buster/latest/SHA512SUMS
 version: 10
 algorithm: SHA512
+checksum_raw: null
