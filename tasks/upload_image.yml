@@ -12,6 +12,7 @@
     disk_format: qcow2
     state: present
     filename: "{{ tmp_folder }}/{{ filename }}"
+    min_disk: "{{ min_disk_size }}"
     properties:
       description: "{{ ansible_date_time.date }}"
       uploaded_by: Image Uploader
