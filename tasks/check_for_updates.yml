@@ -51,6 +51,7 @@
     ssh_user: "{{ image_data.ssh_user | default(image_data.distribution) }}"
     testing_enabled: "{{ image_data.testing_enabled | default(true) }}"
     config_drive: "{{ image_data.config_drive | default(false) }}"
+    min_disk_size: "{{ image_data.min_disk_size | default(10) }}"
     display_name: >-
       {{
         image_data.display_name | default(

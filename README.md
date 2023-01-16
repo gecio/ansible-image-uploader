@@ -91,6 +91,7 @@ version:          Version number (optional)
 ssh_user:         Default user in the image (optional, defaults to distribution)
 testing_enabled:  Enables extended testing (optional, defaults to True)
 display_name:     Override the generated image name (optional)
+min_disk_size:    Override the minimum disk size (optional, defaults to 10GB)
 # (more to come)
 ```
 
