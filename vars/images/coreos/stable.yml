@@ -1,8 +1,8 @@
 distribution: coreos
 release: "stable"
 display_name: CoreOS Stable
-url: https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/38.20230819.3.0/x86_64/fedora-coreos-38.20230819.3.0-openstack.x86_64.qcow2.xz
-checksum_raw: e1eec662bd3c14767bc10c89d60388a85dff75b5af9391c7fd45603c5f99f942
+url: https://builds.coreos.fedoraproject.org/prod/streams/stable/builds/38.20230902.3.0/x86_64/fedora-coreos-38.20230902.3.0-openstack.x86_64.qcow2.xz
+checksum_raw: 3246ce14dbca4457e926a5f1a562213c0f16b36f0239c3893d42bf4ea0fafc9d
 algorithm: SHA256
 ssh_user: core
 testing_enabled: false
