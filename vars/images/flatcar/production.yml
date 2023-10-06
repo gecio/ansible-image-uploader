@@ -5,4 +5,4 @@ checksum: https://stable.release.flatcar-linux.net/amd64-usr/current/flatcar_pro
 algorithm: SHA512
 ssh_user: core
 testing_enabled: false
-display_name: Flatcar_Production
+display_name: Flatcar
