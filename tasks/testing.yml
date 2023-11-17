@@ -140,13 +140,11 @@
   block:
     - name: Test Echo on New Server
       ansible.builtin.command: "date"
+      retries: 10
+      delay: 3
+      register: result
+      until: result.rc == 0
       changed_when: false
-      register: echo_output
-
-    # Print the echo to command line
-    - name: Print Echo
-      ansible.builtin.debug:
-        var: echo_output
 
 ###################################################################################
 ###  Once tested, the instance and associated resources should then be removed ###
