@@ -1,0 +1,6 @@
+distribution: debian
+release: bookworm
+url: http://cloud.debian.org/images/cloud/bookworm/latest/debian-12-genericcloud-amd64.qcow2
+checksum: http://cloud.debian.org/images/cloud/bookworm/latest/SHA512SUMS
+version: 12
+algorithm: SHA512
