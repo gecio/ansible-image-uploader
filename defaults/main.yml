@@ -3,6 +3,7 @@ images_enabled:
   - ubuntu/jammy_jellyfish
   - ubuntu/bionic_beaver
   - ubuntu/focal_fossa
+  - debian/bookworm
   - debian/bullseye
   - debian/buster
   - flatcar/production
