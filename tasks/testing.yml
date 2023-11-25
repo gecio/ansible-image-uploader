@@ -92,14 +92,6 @@
   async: 600
   poll: 5
 
-### Ensure we have a running instance with SSH
-- name: Wait for SSH Port to open
-  ansible.builtin.wait_for:
-    port: 22
-    host: "{{ server.openstack.public_v4 }}"
-    search_regex: SSH
-    delay: 2
-
 ### Add the server to our inventory
 - name: Add the server to our inventory
   ansible.builtin.add_host:
@@ -109,29 +101,23 @@
     host_key_checking: false
     ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
-### Test the new instance
-- name: Run tests
-  when: not testing_enabled
-  block:
-    - name: Wait period
-      ansible.builtin.command: sleep 20
-      changed_when: false
-
-    # Try a manual ssh connection
-    - name: Test connecting manually (for instances without python)
-      ansible.builtin.command: >-
-        ssh
-          {{ server.openstack.public_v4 }}
-          -l {{ ssh_user }}
-          -i {{ tmp_folder }}/ssh.key
-          -o StrictHostKeyChecking=no
-          -o UserKnownHostsFile=/dev/null
-          -T
-          exit
-      retries: 10
-      register: result
-      until: result.rc == 0
-      changed_when: false
+# We cant use wait_for_connection as not all images have python
+- name: Wait for SSH Port to open
+  ansible.builtin.command: >-
+    ssh
+      {{ server.openstack.public_v4 }}
+      -l {{ ssh_user }}
+      -i {{ tmp_folder }}/ssh.key
+      -o StrictHostKeyChecking=no
+      -o UserKnownHostsFile=/dev/null
+      -o ConnectTimeout=5
+      -T
+      exit
+  retries: 30
+  delay: 5
+  register: result
+  until: result.rc == 0
+  changed_when: false
 
 ### Test the new instance
 - name: Run tests
@@ -140,10 +126,6 @@
   block:
     - name: Test Echo on New Server
       ansible.builtin.command: "date"
-      retries: 10
-      delay: 3
-      register: result
-      until: result.rc == 0
       changed_when: false
 
 ###################################################################################
