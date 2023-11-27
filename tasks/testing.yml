@@ -3,171 +3,170 @@
 ###  Create all necessary resources to launch and test an instance from the image ###
 #####################################################################################
 
-### Cleanup previous testing stuff
-- name: Unregister previous SSH key
-  openstack.cloud.keypair:
-    state: absent
-    name: image_test
-
-- name: Remove old testing instance
-  openstack.cloud.server:
-    name: image-test-instance
-    state: absent
-
 ### Setup ssh key pair
-- name: Create SSH keypair
-  ansible.builtin.user:
-    name: "{{ lookup('env', 'USER') }}"
-    generate_ssh_key: true
-    ssh_key_file: "{{ tmp_folder }}/ssh.key"
-  register: generated_ssh_key
-
-- name: Register SSH key in OpenStack
-  openstack.cloud.keypair:
-    state: present
-    name: image_test
-    public_key: "{{ generated_ssh_key.ssh_public_key }}"
-
-### Create Network, Subnet and Router, required for instances
-- name: Create Network
-  openstack.cloud.network:
-    state: present
-    name: image-test-network
-
-- name: Create subnet
-  openstack.cloud.subnet:
-    state: present
-    network_name: image-test-network
-    name: image-test-subnet
-    cidr: 192.168.0.0/24
-
-- name: Create router
-  openstack.cloud.router:
-    state: present
-    name: image-test-router
-    network: provider
-    interfaces:
-      - image-test-subnet
-
-### Create Security Group and Rules
-- name: Create security group
-  openstack.cloud.security_group:
-    state: present
-    name: image-test-securitygroup
-    description: Security Group For Image Testing
-
-- name: Allow ssh
-  openstack.cloud.security_group_rule:
-    security_group: image-test-securitygroup
-    protocol: tcp
-    port_range_min: 22
-    port_range_max: 22
-    remote_ip_prefix: 0.0.0.0/0
-
-- name: Allow icmp
-  openstack.cloud.security_group_rule:
-    security_group: image-test-securitygroup
-    protocol: icmp
-    remote_ip_prefix: 0.0.0.0/0
-
-### Create Instance
-- name: Create an instance
-  openstack.cloud.server:
-    name: image-test-instance
-    auto_ip: "{{ images_testing_auto_ip }}"
-    availability_zone: "{{ images_testing_availability_zone }}"
-    boot_from_volume: "{{ images_testing_boot_from_volume }}"
-    config_drive: "{{ config_drive }}"
-    delete_fip: "{{ images_testing_delete_fip }}"
-    flavor: "{{ images_testing_flavor }}"
-    image: "{{ image.id }}"
-    key_name: image_test
-    network: image-test-network
-    reuse_ips: true
-    security_groups:
-      - default
-      - image-test-securitygroup
-    timeout: 600
-  register: server
-  async: 600
-  poll: 5
-
-### Add the server to our inventory
-- name: Add the server to our inventory
-  ansible.builtin.add_host:
-    name: "{{ server.openstack.public_v4 }}"
-    ansible_user: "{{ ssh_user }}"
-    ansible_ssh_private_key_file: "{{ tmp_folder }}/ssh.key"
-    host_key_checking: false
-    ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
-
-# We cant use wait_for_connection as not all images have python
-- name: Wait for SSH Port to open
-  ansible.builtin.command: >-
-    ssh
-      {{ server.openstack.public_v4 }}
-      -l {{ ssh_user }}
-      -i {{ tmp_folder }}/ssh.key
-      -o StrictHostKeyChecking=no
-      -o UserKnownHostsFile=/dev/null
-      -o ConnectTimeout=5
-      -T
-      exit
-  retries: 30
-  delay: 5
-  register: result
-  until: result.rc == 0
-  changed_when: false
-
-### Test the new instance
-- name: Run tests
-  when: testing_enabled
-  delegate_to: "{{ server.openstack.public_v4 }}"
+- name: Test image
   block:
-    - name: Test Echo on New Server
-      ansible.builtin.command: "date"
+    - name: Create SSH keypair
+      ansible.builtin.user:
+        name: root
+        generate_ssh_key: true
+        ssh_key_file: "{{ tmp_folder }}/ssh.key"
+      register: generated_ssh_key
+
+    - name: Register SSH key in OpenStack
+      openstack.cloud.keypair:
+        state: present
+        name: image_test
+        public_key: "{{ generated_ssh_key.ssh_public_key }}"
+
+    ### Create Network, Subnet and Router, required for instances
+    - name: Create Network
+      openstack.cloud.network:
+        state: present
+        name: image-test-network
+
+    - name: Create subnet
+      openstack.cloud.subnet:
+        state: present
+        network_name: image-test-network
+        name: image-test-subnet
+        cidr: 192.168.0.0/24
+
+    - name: Create router
+      openstack.cloud.router:
+        state: present
+        name: image-test-router
+        network: provider
+        interfaces:
+          - image-test-subnet
+
+    ### Create Security Group and Rules
+    - name: Create security group
+      openstack.cloud.security_group:
+        state: present
+        name: image-test-securitygroup
+        description: Security Group For Image Testing
+
+    - name: Allow ssh
+      openstack.cloud.security_group_rule:
+        security_group: image-test-securitygroup
+        protocol: tcp
+        port_range_min: 22
+        port_range_max: 22
+        remote_ip_prefix: 0.0.0.0/0
+
+    - name: Allow icmp
+      openstack.cloud.security_group_rule:
+        security_group: image-test-securitygroup
+        protocol: icmp
+        remote_ip_prefix: 0.0.0.0/0
+
+    ### Create Instance
+    - name: Create an instance
+      openstack.cloud.server:
+        name: image-test-instance
+        auto_ip: "{{ images_testing_auto_ip }}"
+        availability_zone: "{{ images_testing_availability_zone }}"
+        boot_from_volume: "{{ images_testing_boot_from_volume }}"
+        config_drive: "{{ config_drive }}"
+        delete_fip: "{{ images_testing_delete_fip }}"
+        flavor: "{{ images_testing_flavor }}"
+        image: "{{ image.id }}"
+        key_name: image_test
+        network: image-test-network
+        reuse_ips: true
+        security_groups:
+          - default
+          - image-test-securitygroup
+        timeout: 600
+      register: server
+      async: 600
+      poll: 5
+
+    ### Add the server to our inventory
+    - name: Add the server to our inventory
+      ansible.builtin.add_host:
+        name: "{{ server.openstack.public_v4 }}"
+        ansible_user: "{{ ssh_user }}"
+        ansible_ssh_private_key_file: "{{ tmp_folder }}/ssh.key"
+        host_key_checking: false
+        ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+
+    # We cant use wait_for_connection as not all images have python
+    - name: Wait for SSH Port to open
+      ansible.builtin.command: >-
+        ssh
+          {{ server.openstack.public_v4 }}
+          -l {{ ssh_user }}
+          -i {{ tmp_folder }}/ssh.key
+          -o StrictHostKeyChecking=no
+          -o UserKnownHostsFile=/dev/null
+          -o ConnectTimeout=5
+          -T
+          exit
+      retries: 30
+      delay: 5
+      register: result
+      until: result.rc == 0
       changed_when: false
+
+    ### Test the new instance
+    - name: Run tests
+      when: testing_enabled
+      delegate_to: "{{ server.openstack.public_v4 }}"
+      block:
+        - name: Test Echo on New Server
+          ansible.builtin.command: "date"
+          changed_when: false
+
+
+# If we fail anywhere in our testing make sure that we delete the testing image
+  rescue:
+    - name: Delete testing image
+      openstack.cloud.image:
+        name: "{{ image.id }}"
+        state: absent
 
 ###################################################################################
 ###  Once tested, the instance and associated resources should then be removed ###
 ###################################################################################
+  always:
+    ### Delete the instance
+    - name: Delete an instance
+      openstack.cloud.server:
+        name: image-test-instance
+        state: absent
 
-### Delete the instance
-- name: Delete an instance
-  openstack.cloud.server:
-    name: image-test-instance
-    state: absent
+    ### Delete Security Group
+    - name: Delete security group
+      openstack.cloud.security_group:
+        state: absent
+        name: image-test-securitygroup
 
-### Delete Security Group
-- name: Delete security group
-  openstack.cloud.security_group:
-    state: absent
-    name: image-test-securitygroup
+    # Delete Router, Subnet, then Network
+    - name: Delete router
+      openstack.cloud.router:
+        state: absent
+        name: image-test-router
 
-# Delete Router, Subnet, then Network
-- name: Delete router
-  openstack.cloud.router:
-    state: absent
-    name: image-test-router
+    - name: Delete subnet
+      openstack.cloud.subnet:
+        state: absent
+        network_name: image-test-network
+        name: image-test-subnet
 
-- name: Delete subnet
-  openstack.cloud.subnet:
-    state: absent
-    network_name: image-test-network
-    name: image-test-subnet
+    - name: Delete network
+      openstack.cloud.network:
+        state: absent
+        name: image-test-network
 
-- name: Delete network
-  openstack.cloud.network:
-    state: absent
-    name: image-test-network
+    ### Deregister, then delete SSH key
+    - name: Deregister SSH key from OpenStack
+      openstack.cloud.keypair:
+        state: absent
+        name: image_test
 
-### Deregister, then delete SSH key
-- name: Deregister SSH key from OpenStack
-  openstack.cloud.keypair:
-    state: absent
-    name: image_test
-
-- name: Delete SSH key file
-  ansible.builtin.file:
-    dest: "{{ tmp_folder }}/ssh.key"
-    state: absent
+    - name: Delete SSH key file
+      ansible.builtin.file:
+        dest: "{{ tmp_folder }}/ssh.key"
+        state: absent
