@@ -13,8 +13,8 @@
   register: file_information
   changed_when: false
 
-- name: File is a qcow2 image
-  when: '"QEMU QCOW2 Image" in file_information.stdout'
+- name: File is a qcow image
+  when: '"QEMU QCOW" in file_information.stdout'
   block:
     - name: Proceed to upload
       ansible.builtin.include_tasks:
