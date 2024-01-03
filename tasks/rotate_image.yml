@@ -1,6 +1,8 @@
 - name: Check for previous public image
   openstack.cloud.image_info:
     image: "{{ display_name }} - Latest"
+    properties:
+      uploaded_by: Image Uploader
   register: latest_image_in_glance
   changed_when: latest_image_in_glance.image
 
